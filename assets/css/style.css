@@ -1,220 +1,145 @@
-
-
-const stdContainer = document.getElementById('stdContainer');
-const stdForm = document.getElementById('stdForm');
-const addStdBtn = document.getElementById('addStdBtn');
-const updateStdBtn = document.getElementById('updateStdBtn');
-const fnameControl = document.getElementById('fname');
-const lnameControl = document.getElementById('lname');
-const emailControl = document.getElementById('email');
-const stdTable = document.getElementById('stdTable');
-const noStdMsg = document.getElementById('noStdMsg');
-const contactControl = document.getElementById('contact');
-
-//DB
-let stdArr = [
-  {
-    fname: 'Jhon',
-    lname: 'Doe',
-    email: 'jd@gmail.com',
-    contact: '1234567890',
-    stdId: '6edf782c-2bad-4fc8-b013-5468a45891fb'
-  },
-  {
-    fname: 'May',
-    lname: 'Doe',
-    email: 'may@gmail.com',
-    contact: '7895642310',
-    stdId: '6789789789c-2bad-4fc8-b013-5468a45891fb'
-  },
-  {
-    fname: 'June',
-    lname: 'Doe',
-    email: 'june@gmail.com',
-    contact: '9876542310',
-    stdId: 'ee688e59-7c9e-40dd-9b92-2b69db8f9db7'
-  }
-];
-
-// newly added
-function toggleView() {
-  if (stdArr.length === 0) {
-    stdTable.classList.add('d-none');
-    noStdMsg.classList.remove('d-none');
-  } else {
-    stdTable.classList.remove('d-none');
-    noStdMsg.classList.add('d-none');
-  }
+/* Global styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f5f7fb;
+  color: #333;
 }
 
-function createTrs(arr) {
-  let result = '';  // undefind
-  arr.forEach((std, i) => {
-    result += `
-      <tr id="${std.stdId}">
-        <td>${i + 1}</td>
-        <td>${std.fname} ${std.lname}</td>
-        <td>${std.email}</td>
-        <td>${std.contact}</td>
-
-        <td>
-          <i onclick="onStdEdit(this )"
-            role="button"
-            class="fa-solid fa-pen-to-square fa-2x text-success">
-          </i>
-        </td>
-
-        <td>
-          <i onclick="onStdRemove(this)"
-            role="button"
-            class="fa-solid fa-trash fa-2x text-danger">
-          </i>
-        </td>
-      </tr>
-    `;
-  });
-
-  stdContainer.innerHTML = result;
+.container {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0;
 }
 
-createTrs(stdArr);
-
-toggleView(); // newly added
-
-function onStdRemove(ele) {
-    let REMOVED_ID = ele.closest('tr').id;
-    let getConfirm = confirm(
-      `Are you sure, you want to remove the Student with ID ${REMOVED_ID} ?`
-    )
-    if (getConfirm) {
-    let getIndex = stdArr.findIndex(std => {
-        return std.stdId === REMOVED_ID;
-    });
-
-    let REMOVED_STD = stdArr.splice(getIndex, 1);
-    ele.closest('tr').remove();
-    let allTrs = [...document.querySelectorAll('#stdContainer tr')]
-    allTrs.forEach((tr,i) => {
-      tr.firstElementChild.innerText = i + 1 
-    })
-
-    toggleView(); // newly added
-
-    Swal.fire({
-            icon: 'success',
-            title: `The student ${REMOVED_STD[0].fname} ${REMOVED_STD[0].lname} Removed successfully !!!`,
-            timer: 3000
-        });
-
-    }
-}
- 
-let EDIT_ID
-function onStdEdit (ele) {
-  EDIT_ID = ele.closest('tr').id
-  let EDIT_OBJ = stdArr.find(std => {
-    return std.stdId === EDIT_ID
-  })
-
-  fnameControl.value = EDIT_OBJ.fname
-  lnameControl.value = EDIT_OBJ.lname
-  emailControl.value = EDIT_OBJ.email
-  contactControl.value = EDIT_OBJ.contact
-
-  addStdBtn.classList.add('d-none')
-  updateStdBtn.classList.remove('d-none')
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-
-function onStdSubmit(eve) {
-    eve.preventDefault();
-    let NEW_STD = {
-        fname: fnameControl.value,
-        lname: lnameControl.value,
-        email: emailControl.value,
-        contact: contactControl.value,
-        stdId: Date.now().toString()
-    };
-    cl(NEW_STD);
-    // added new OBJ in DB
-    stdArr.push(NEW_STD);
-
-    stdForm.reset();
-
-    // createTrs(stdArr);
-
-    // we will crete a new tr and append it in the tbody
-    let tr = document.createElement('tr');
-    tr.id = NEW_STD.stdId;
-    tr.innerHTML = `
-        <td>${stdArr.length}</td>
-        <td>${NEW_STD.fname} ${NEW_STD.lname}</td>
-        <td>${NEW_STD.email}</td>
-        <td>${NEW_STD.contact}</td>
-
-        <td>
-          <i onclick="onStdEdit(this)"
-            role="button"
-            class="fa-solid fa-pen-to-square fa-2x text-success">
-          </i>
-        </td>
-
-        <td>
-          <i onclick="onStdRemove(this)"
-            role="button"
-            class="fa-solid fa-trash fa-2x text-danger">
-          </i>
-        </td>
-      
-    `
-
-    stdContainer.append(tr);
-
-    toggleView();   // newly added
-
-    Swal.fire({
-      icon: 'success',
-      title: `The new student ${NEW_STD.fname} ${NEW_STD.lname} has been added successfully.`,
-      timer: 3000
-    });
+/* Card layout */
+.card {
+  background: #ffffff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(18, 38, 63, 0.08);
+  padding: 1.5rem;
 }
 
-function onStdUpdate() {
-  // update_ID
-  let UPDATE_ID = EDIT_ID
+.card + .card {
+  margin-top: 1.5rem;
+}
 
-  // update_OBJ
-  let UPDATE_OBJ = {
-    fname: fnameControl.value,
-    lname: lnameControl.value,
-    email: emailControl.value,
-    contact: contactControl.value,
-    stdId: UPDATE_ID
+/* Form styles */
+.form-group {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d6dbe8;
+  border-radius: 10px;
+  background: #fdfdff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #5c7cfa;
+  box-shadow: 0 0 0 4px rgba(92, 124, 250, 0.12);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: #5c7cfa;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  background: #4f6ff9;
+}
+
+.btn--secondary {
+  background: #e5eaf7;
+  color: #253858;
+}
+
+.btn--secondary:hover {
+  background: #d8ddee;
+}
+
+/* Table styles */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th,
+td {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e8ef;
+}
+
+th {
+  background: #f6f9ff;
+  font-weight: 700;
+}
+
+tbody tr:hover {
+  background: #fbfcff;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: #e7f4ff;
+  color: #0f4da0;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card {
+    padding: 1.25rem;
   }
 
-  stdForm.reset();
-  // update in DB (in stdArr)
-  let getIndex = stdArr.findIndex(std => std.stdId === UPDATE_ID);
-  stdArr[getIndex] = UPDATE_OBJ;
-
-  // update TR (only one) in UI
-  let tr = document.getElementById(UPDATE_ID).children
-  tr[1].innerText = `${UPDATE_OBJ.fname} ${UPDATE_OBJ.lname}`
-  tr[2].innerText = `${UPDATE_OBJ.email}`
-  tr[3].innerText = `${UPDATE_OBJ.contact}`
-  // hide update btn and show add btn
-
-  addStdBtn.classList.remove('d-none')
-  updateStdBtn.classList.add('d-none')
-
-  Swal.fire({
-    title: `The student ${UPDATE_OBJ.fname} ${UPDATE_OBJ.lname} updated successfully !!!`,
-    icon: 'success',
-    timer: 3000
-  });
+  th,
+  td {
+    padding: 0.85rem 0.5rem;
+  }
 }
-
-stdForm.addEventListener('submit', onStdSubmit);
-updateStdBtn.addEventListener('click', onStdUpdate)
-
-
